@@ -1,0 +1,117 @@
+{% extends "html.html" %}
+{% load staticfiles %}
+{% block morecss %}
+    <link href="{% static 'css/carousel.css' %}" rel="stylesheet">
+    <style type="text/css">
+        #about {
+            margin-top: 120px;
+            margin-bottom: 120px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-default navbar-static-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="{% url 'home' %}">YS Bank</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="{% url 'atm' %}">ATM</a></li>
+                <li><a href="{% url 'bank_service' %}">Bank Service</a></li>
+                <li><a href="{% url 'shopping' %}">Shopping</a></li>
+                <li><a href="#about" data-toggle="tab">About</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="home">
+            <div id="myCarousel" class="carousel slide" data-ride="carousel">
+              <!-- Indicators -->
+              <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1"></li>
+                <li data-target="#myCarousel" data-slide-to="2"></li>
+              </ol>
+              <div class="carousel-inner">
+                <div class="item active">
+                  <img src="{% static 'images/slide1.jpg' %}" alt="bank for zos">
+                  <div class="container">
+                    <div class="carousel-caption">
+                      <h1>Banking for GENERATION z</h1>
+                      <p>Combining the powerful mainframe database with creative design, a bank application was born in the Master the Mainframe World Championship.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="{% static 'images/slide2.jpg' %}" alt="security">
+                  <div class="container">
+                    <div class="carousel-caption">
+                      <h1>Secure</h1>
+                      <p>Enjoy greater security on your debit cards.</p>
+                      <p>&nbsp;</p>
+                      <p>&nbsp;</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="item">
+                  <img src="{% static 'images/slide3.jpg' %}" alt="Third slide">
+                  <div class="container">
+                    <div class="carousel-caption">
+                      <h1 class="dark-caption">Mobile</h1>
+                      <p>Access your account wherever you want.</p>
+                      <p>&nbsp;</p>
+                      <p>&nbsp;</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+              <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+            </div>
+        </div>
+        <div class="tab-pane container" id="about">
+            <h2>Shaform</h2>
+            <p>Shaform is a 1st year graduate student studying Computer Science and Information Engineering at National Taiwan University in Taipei City, Taiwan. Shaform enjoys Master the Mainframe as he is able to learn by doing, gaining experience from completing tasks on the mainframe. The competition inspires Shaform to accept new computing challenges. He is hoping the World Championship will help him improve and hone his coding and programming skills.</p>
+            <h2>IBM Master the Mainframe World Championship</h2>
+            <p>The IBM Master the Mainframe World Championship brings together the next generation of mainframe all-stars. Out of 20,000 IBM Master the Mainframe student contestants, 43 Master the Mainframe regional contest winners that have demonstrated superior programming skills on the mainframe have been selected to compete on the world stage.</p>
+            <h2>Credits</h2>
+            <ul>
+                <li>jQuery: <a href="http://jquery.com/">http://jquery.com/</a> - <a href="http://en.wikipedia.org/wiki/MIT_License">MIT license</a></li>
+                <li>jQuery Keypad: <a href="http://keith-wood.name/keypad.html">http://keith-wood.name/keypad.html</a> - <a href="http://en.wikipedia.org/wiki/MIT_License">MIT license</a></li>
+                <li>jQuery Timer: <a href="https://github.com/jchavannes/jquery-timer">https://github.com/jchavannes/jquery-timer</a> - <a href="http://en.wikipedia.org/wiki/MIT_License">MIT license</a></li>
+                <li>Bootstrap: <a href="http://getbootstrap.com/">http://getbootstrap.com/</a> - <a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">MIT license</a></li>
+                <li>Bootstrap Switch: <a href="http://www.bootstrap-switch.org/">http://www.bootstrap-switch.org/</a> - <a href="https://github.com/nostalgiaz/bootstrap-switch/blob/master/LICENSE">Apache license 2.0</a></li>
+                <li>DataTables: <a href="https://datatables.net/">https://datatables.net/</a> - <a href="https://datatables.net/license_bsd">BSD (3-point) style license</a></li>
+                <li>typeahead.js: <a href="http://twitter.github.io/typeahead.js/">http://twitter.github.io/typeahead.js/</a> - <a href="http://en.wikipedia.org/wiki/MIT_License">MIT license</a></li>
+                <li>photo - 國立台灣文學館: <a href="http://commons.wikimedia.org/wiki/File:%E5%9C%8B%E7%AB%8B%E5%8F%B0%E7%81%A3%E6%96%87%E5%AD%B8%E9%A4%A8.JPG">File:國立台灣文學館.JPG</a> - <a href="http://creativecommons.org/licenses/by-sa/3.0/deed.en">Creative Commons Attribution-Share Alike 3.0 Unported</a></li>
+                <li>photo - New York City on last trip: <a href="http://commons.wikimedia.org/wiki/File:New_York_City_on_last_trip_2013-11-05_00-09.jpg">File:New_York_City_on_last_trip_2013-11-05_00-09.jpg</a> - <a href="http://creativecommons.org/licenses/by-sa/3.0/deed.en">Creative Commons Attribution-Share Alike 3.0 Unported</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container marketing">
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right">&copy; 2014 YS Bank, Inc.</p>
+        <p>The IBM Master the Mainframe World Championship<br/>April 7, 2014 in New York City</p>
+      </footer>
+    </div><!-- /.container -->
+{% endblock %}
+{% block morejs %}
+    <script src="{% static 'js/docs.min.js' %}"></script>
+{% endblock %}

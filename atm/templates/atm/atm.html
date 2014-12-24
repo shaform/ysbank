@@ -1,0 +1,475 @@
+{% extends "html.html" %}
+{% load staticfiles %}
+{% block morecss %}
+    <link href="{% static 'css/jquery.dataTables.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jquery.dataTables_themeroller.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jquery.keypad.alt.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-switch.css' %}" rel="stylesheet">
+    <style type="text/css">
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        body {
+            min-height: 400px;
+            padding-top: 170px;
+            padding-bottom: 170px;
+        }
+        .bank_text {
+            font-size: 200%;
+        }
+        .balance_text {
+            margin-top: 20px;
+        }
+        .name {
+            color: #004ab3;
+        }
+        .account {
+            color: #004ab3;
+        }
+        .balance {
+            color: #26AD00;
+        }
+        .amount {
+            color: red;
+        }
+        .sorting { background: url('{% static 'images/sort_both.png' %}') no-repeat center right; }
+        .sorting_asc { background: url('{% static 'images/sort_asc.png' %}') no-repeat center right; }
+        .sorting_desc { background: url('{% static 'images/sort_desc.png' %}') no-repeat center right; }
+
+        .sorting_asc_disabled { background: url('{% static 'images/sort_asc_disabled.png' %}') no-repeat center right; }
+        .sorting_desc_disabled { background: url('{% static 'images/sort_desc_disabled.png' %}') no-repeat center right; }
+
+        .paginate_enabled_previous { background: url('{% static 'images/back_enabled.png' %}') no-repeat top left; }
+        .paginate_enabled_previous:hover { background: url('{% static 'images/back_enabled_hover.png' %}') no-repeat top left; }
+        .paginate_disabled_previous { background: url('{% static 'images/back_disabled.png' %}') no-repeat top left; }
+
+        .paginate_enabled_next { background: url('{% static 'images/forward_enabled.png' %}') no-repeat top right; }
+        .paginate_enabled_next:hover { background: url('{% static 'images/forward_enabled_hover.png' %}') no-repeat top right; }
+        .paginate_disabled_next { background: url('{% static 'images/forward_disabled.png' %}') no-repeat top right; }
+         
+        #footer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Set the fixed height of the footer here */
+        }
+    </style>
+{% endblock %}
+{% block morejqs %}
+{% endblock %}
+{% block body %}
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'atm' %}">YS ATM</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="inquiry_btn" href="#inquiry" data-toggle="tab">Inquiry</a></li>
+            <li><a id="withdrawal_btn" href="#withdrawal" data-toggle="tab">Withdrawal</a></li>
+            <li><a id="deposit_btn" href="#deposit" data-toggle="tab">Deposit</a></li>
+            <li><a id="transfer_btn" href="#transfer" data-toggle="tab">Transfer</a></li>
+            <li><a id="info_btn" href="#info" data-toggle="tab" class="hide">Info</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a id="changepin_btn" href="#changepin" data-toggle="tab">Change PIN</a></li>
+                <li><a id="changedebit_btn" href="#changedebit" data-toggle="tab">Debit Card</a></li>
+                <li><a id="logout" href="#">Logout</a></li>
+                <li class="divider"></li>
+                <li><a href="{% url 'home' %}">Back to YS Bank</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+        <div id="timeout" class="alert alert-info hide">The session will expire in <span id="timeout_time"></span> seconds.</div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="atm">
+                <h1>Welcome to YS ATM</h1>
+                <div id="welcome" class="bank_text balance_text">
+                </div>
+            </div>
+            <div class="tab-pane" id="inquiry">
+                <div id="inquiry_balance" class="bank_text balance_text">
+                </div>
+                <div id="inquiry_place"></div>
+            </div>
+            <div class="tab-pane" id="withdrawal">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">How much do you want to withdraw?</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="withdrawal_form" method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Amount" name="w_amount" type="text" value="" pattern="\d+(.\d{1,2})?" maxlength="8" required>
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="deposit">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">How much do you want to deposit?</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="deposit_form" method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Amount" name="d_amount" type="text" value="" pattern="\d+(.\d{1,2})?" maxlength="8" required>
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="transfer">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">How much do you want to transfer?</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="transfer_form" method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                The amount to transfer:
+                                <input class="form-control" placeholder="Amount" name="t_amount" type="text" value="" pattern="\d+(.\d{1,2})?" maxlength="8" required>
+                            </div>
+                            <div class="form-group">
+                                Transfer your fund to:
+                                <input class="num_keypad form-control" placeholder="a 12-digit account number" name="t_acct" type="text" value="" pattern="\d{12}" maxlength="12" required>
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="changepin">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">Change your PIN:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="changepin_form" method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                Your PIN:
+                                <input class="num_keypad form-control" placeholder="Old PIN" name="old_pin" type="password" value="" pattern="\d{4}" maxlength="4" required>
+                            </div>
+                            <div class="form-group">
+                                Your new PIN:
+                                <input class="num_keypad form-control" placeholder="a 4-digit number" name="pin" type="password" value="" pattern="\d{4}" maxlength="4" required>
+                            </div>
+                            <div class="form-group">
+                                Confirm your new PIN:
+                                <input class="num_keypad form-control" placeholder="repeat the new PIN" name="pin_again" type="password" value="" pattern="\d{4}" maxlength="4" required>
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="changedebit">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">Change Debit Card Status:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="changedebit_form"  method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                Status:
+                                <input name="status" type="checkbox" checked data-on-text="Active" data-off-text="Inactive" data-size="large" data-on-color="success" data-off-color="danger">
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="info">
+                <div class="alert"></div>
+                <div class="bank_text"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" class="container">
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right">&copy; 2014 YS Bank, Inc.</p>
+        <p>The IBM Master the Mainframe World Championship<br/>April 7, 2014 in New York City</p>
+      </footer>
+    </div><!-- /.container -->
+{% endblock %}
+{% block morejs %}
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/jquery.timer.js' %}"></script>
+    <script src="{% static 'js/jquery.plugin.js' %}"></script>
+    <script src="{% static 'js/jquery.keypad.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-switch.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("[name='status']").bootstrapSwitch();
+            $(".num_keypad").keypad({randomiseNumeric: true, keypadOnly: false});
+            var timeoutTime = 360;
+            var update_timeout = function() {
+                if (timeoutTime <= 60) {
+                    if ($("#timeout").hasClass("hide")) {
+                        $("#timeout").removeClass("hide");
+                    }
+                    $("#timeout_time").text(timeoutTime);
+                } else {
+                    if (!$("timeout").hasClass("hide")) {
+                        $("#timeout").addClass("hide");
+                    }
+                }
+            };
+            var timer = $.timer(function() {
+                timeoutTime--;
+                update_timeout();
+                if (timeoutTime <= 0) {
+                    logout();
+                }
+            });
+            timer.set({ time : 1000, autostart : true });
+            $(this).mousemove(function (e) {
+                timeoutTime = 360;
+                update_timeout();
+            });
+            $(this).keypress(function (e) {
+                timeTime = 360;
+                update_timeout();
+            });
+
+            // -- //
+
+            var show_welcome = function() {
+                $("#welcome").html("");
+                $.ajax({ type: "POST", url: "", data: {fnc: 'info'}, complete: welcome_complete });
+            };
+            var show_inquiry = function() {
+                $.ajax({ type: "POST", url: "", data: {fnc: 'inquiry'}, complete: inquiry_complete });
+                $('#inquiry_place').html('<div class="alert alert-info">Loading...</div>');
+                $('#inquiry_balance').html('');
+            };
+            var logout = function() {
+                $.ajax({ type: "POST", url: "", data: {fnc: 'logout'},
+                    complete: function(res) { location.reload(); }});
+            };
+            var show_info = function() {
+                $("#info div").eq(0).removeClass("alert-warning").addClass("alert-info").text("Processing...");
+                $("#info div").eq(1).text("");
+                $("#info_btn").tab("show");
+                $(".navbar .active").removeClass("active");
+            };
+            var clear_forms = function() {
+                $("form input[name='d_amount'], form input[name='t_amount'], form input[name='w_amount'], form input[name='t_acct']").val('');
+                $("form input[name='old_pin'], form input[name='pin'], form input[name='pin_again']").val('');
+                $(".active").removeClass("active");
+            };
+
+            // -- //
+
+            var welcome_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#welcome").html("<p>Hi, <span class=\"name\">" + jObj.name + "</span>.</p>"
+                        + "<p>Your balance of account <span class=\"account\">" + jObj.account_number + "</span> is:<br/>"
+                        + "<span class=\"balance\">$" + jObj.balance + "</span></p>");
+                } else {
+                    if (res.responseText == 'logout') {
+                        logout();
+                    }
+                }
+            };
+
+            var inquiry_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $('#inquiry_place').html('<table cellpadding="0" cellspacing="0" border="0" class="display table table-bordered" id="inquiry_table"></table>');
+                    $('#inquiry_table').dataTable({
+                            "aaData": jObj.trans,
+                            "iDisplayStart": Math.floor(Math.max(1,jObj.trans.length-1) / 10)*10,
+                            "aoColumns": [
+                            { "sTitle": "Time" },
+                            { "sTitle": "Type" },
+                            { "sTitle": "Amount" },
+                            { "sTitle": "Balance" },
+                    ]
+                    });
+                    $("#inquiry_balance").html("<p>Account number: <span class=\"account\">" + jObj.account_number
+                            + "</span>, &nbsp; Balance: <span class=\"balance\">$" + jObj.balance + "</span></p>");
+                } else {
+                    $('#inquiry_place').html('<div class="alert alert-warning">Error!</div>');
+                    if (res.responseText == 'logout') {
+                        logout();
+                    }
+                }
+            };
+
+            var withdrawal_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#info div").eq(0).text('Success!');
+                    $("#info div").eq(1).html('<p>You withdraw: <span class="amount">$' + jObj.w_amount
+                            + "</span><br/>Balance: <span class=\"balance\">$" + jObj.balance + "</span></p>");
+                } else {
+                    $("#info div").eq(0).removeClass("alert-info").addClass("alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#info div").eq(0).text(res.responseText);
+                    }
+                }
+            };
+            var deposit_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#info div").eq(0).text('Success!');
+                    $("#info div").eq(1).html('<p>You deposit: <span class="amount">$' + jObj.d_amount
+                            + "</span><br/>Balance: <span class=\"balance\">$" + jObj.balance + "</span></p>");
+                } else {
+                    $("#info div").eq(0).removeClass("alert-info").addClass("alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#info div").eq(0).text(res.responseText);
+                    }
+                }
+            };
+            var transfer_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#info div").eq(0).text('Success!');
+                    $("#info div").eq(1).html('<p>You transfer: <span class="amount">$' + jObj.t_amount
+                            + '</span> to <span class="account">' + jObj.t_acct + '</span>'
+                            + '<br/>Balance: <span class="balance">$' + jObj.balance + '</span></p>');
+                } else {
+                    $("#info div").eq(0).removeClass("alert-info").addClass("alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#info div").eq(0).text(res.responseText);
+                    }
+                }
+            };
+            var changepin_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#info div").eq(0).text('Success!');
+                } else {
+                    $("#info div").eq(0).removeClass("alert-info").addClass("alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#info div").eq(0).text(res.responseText);
+                    }
+                }
+            };
+            var changedebit_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#info div").eq(0).text('Success!');
+                } else {
+                    $("#info div").eq(0).removeClass("alert-info").addClass("alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#info div").eq(0).text(res.responseText);
+                    }
+                }
+            };
+
+            // -- //
+            show_welcome();
+
+            $("#logout").click(function(e){
+                logout();
+                return false;
+            });
+            $("#inquiry_btn").click(function(e){
+                show_inquiry();
+            });
+            $("#withdrawal_btn, #deposit_btn, #transfer_btn, #changepin_btn, #changedebit_btn").click(function(e){
+                clear_forms();
+            });
+            $("#withdrawal_form").submit(function(e){
+                e.preventDefault();
+                show_info();
+                var w_amount = $("form input[name='w_amount']").val();
+                var data = {w_amount: w_amount,
+                            fnc: 'withdrawal',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: withdrawal_complete });
+                return false;
+            });
+            $("#deposit_form").submit(function(e){
+                e.preventDefault();
+                show_info();
+                var d_amount = $("form input[name='d_amount']").val();
+                var data = {d_amount: d_amount,
+                            fnc: 'deposit',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: deposit_complete });
+                return false;
+            });
+            $("#transfer_form").submit(function(e){
+                e.preventDefault();
+                show_info();
+                var t_amount = $("form input[name='t_amount']").val();
+                var t_acct = $("form input[name='t_acct']").val();
+                var data = {t_amount: t_amount,
+                            t_acct: t_acct,
+                            fnc: 'transfer',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: transfer_complete });
+                return false;
+            });
+            $("#changepin_form").submit(function(e){
+                e.preventDefault();
+                show_info();
+                var old_pin = $("form input[name='old_pin']").val();
+                var pin = $("form input[name='pin']").val();
+                var pin_again = $("form input[name='pin_again']").val();
+                var t_acct = $("form input[name='t_acct']").val();
+                var data = {old_pin: old_pin,
+                            pin: pin,
+                            pin_again: pin_again,
+                            fnc: 'changepin',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: changepin_complete });
+                return false;
+            });
+            $("#changedebit_form").submit(function(e){
+                e.preventDefault();
+                show_info();
+                var data = {status: $("form input[name='status']").bootstrapSwitch('state') ? 'A' : 'I',
+                            fnc: 'changedebit',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: changedebit_complete });
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

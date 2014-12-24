@@ -1,0 +1,324 @@
+{% extends "html.html" %}
+{% load staticfiles %}
+{% block morecss %}
+    <link href="{% static 'css/bootstrap-switch.css' %}" rel="stylesheet">
+    <link href="{% static 'css/typeahead.css' %}" rel="stylesheet">
+    <style type="text/css">
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        body {
+            min-height: 400px;
+            padding-top: 170px;
+            padding-bottom: 170px;
+        }
+        .bank_text {
+            font-size: 200%;
+        }
+        .balance_text {
+            margin-top: 20px;
+        }
+         
+        #footer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Set the fixed height of the footer here */
+        }
+    </style>
+{% endblock %}
+{% block morejqs %}
+{% endblock %}
+{% block body %}
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'bank_service' %}">YS Bank Service</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="new_btn" href="#new" data-toggle="tab">New Customer</a></li>
+            <li><a id="mgmt_btn" href="#account_mgmt" data-toggle="tab">Account Management</a></li>
+            <li><a id="info_btn" href="#info" data-toggle="tab" class="hide">Info</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a id="logout" href="#">Logout</a></li>
+                <li class="divider"></li>
+                <li><a href="{% url 'home' %}">Back to YS Bank</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+        <div id="msg"></div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="bank_service">
+                <h1>Welcome to YS Bank Service</h1>
+                <div id="welcome" class="bank_text balance_text">
+                </div>
+            </div>
+            <div class="tab-pane" id="info">
+                <div class="alert"></div>
+                <div class="bank_text"></div>
+            </div>
+            <div class="tab-pane" id="account_mgmt">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">Change Status:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="mgmt_form"  method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                <input class="form-control typeahead" placeholder="Account Number" name="account_number" type="text" value="" pattern="\d{12}" maxlength="12" required>
+                            </div>
+                            <div class="form-group">
+                                Status:
+                                <input name="status" type="checkbox" checked data-on-text="Active" data-off-text="Inactive" data-size="large" data-on-color="success" data-off-color="danger">
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="new">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title bank_text">Add a New Customer:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form accept-charset="UTF-8" role="form" id="new_form" method="post">{% csrf_token %}
+                        <fieldset>
+                            <div class="form-group">
+                                First Name:
+                                <input class="form-control" name="firstname" type="text" value="" maxlength="35" required>
+                            </div>
+                            <div class="form-group">
+                                Last Name:
+                                <input class="form-control" name="lastname" type="text" value="" maxlength="35" required>
+                            </div>
+                            <div class="form-group">
+                                Street Address:
+                                <input class="form-control" name="streetaddr" type="text" value="" maxlength="35" required>
+                            </div>
+                            <div class="form-group">
+                                State:
+                                <input class="form-control typeahead" name="state" type="text" value="" maxlength="2" required>
+                            </div>
+                            <div class="form-group">
+                                City:
+                                <input class="form-control typeahead" name="city" type="text" value="" maxlength="35" required>
+                            </div>
+                            <div class="form-group">
+                                Deposit Amount:
+                                <input class="form-control" name="d_amount" type="text" value="" pattern="\d+(.\d{1,2})?" maxlength="8" required>
+                            </div>
+                            <div class="form-group">
+                                Account Number:
+                                <input class="form-control" placeholder="A 12-digit number" name="account_number" type="text" value="" pattern="\d{12}" maxlength="12" oninvalid="this.setCustomValidity('Account number must be a 12-digit number.')" onchange="try{setCustomValidity('')}catch(e){}" required>
+                            </div>
+                            <div class="form-group">
+                                PIN:
+                                <input class="form-control" placeholder="A 4-digit number" name="pin" type="password" value="" pattern="\d{4}" maxlength="4" oninvalid="this.setCustomValidity('PIN must be a 4-digit number.')" onchange="try{setCustomValidity('')}catch(e){}" required>
+                            </div>
+                            <div class="form-group">
+                                Status:
+                                <input name="status" type="checkbox" checked data-on-text="Active" data-off-text="Inactive" data-size="large" data-on-color="success" data-off-color="danger">
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="OK">
+                        </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!---->
+        </div>
+    </div>
+
+    <div id="footer" class="container">
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right">&copy; 2014 YS Bank, Inc.</p>
+        <p>The IBM Master the Mainframe World Championship<br/>April 7, 2014 in New York City</p>
+      </footer>
+    </div><!-- /.container -->
+{% endblock %}
+{% block morejs %}
+    <script src="{% static 'js/bootstrap-switch.min.js' %}"></script>
+    <script src="{% static 'js/typeahead.bundle.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("[name='status']").bootstrapSwitch();
+            var account_numbers = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('num'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                limit: 10,
+                prefetch: {
+                    url: '{% url 'data_account_number' %}',
+                    filter: function(list) {
+                        return $.map(list, function(account_number) {
+                            return { num: account_number };
+                        });
+                    }
+                }
+            });
+            account_numbers.initialize();
+            $('#account_mgmt .typeahead').typeahead(null, {
+                name: 'account_numbers',
+                displayKey: 'num',
+                source: account_numbers.ttAdapter()
+            });
+            var states = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                limit: 10,
+                prefetch: {
+                    url: '{% url 'data_state' %}',
+                    filter: function(list) {
+                        return $.map(list, function(state) {
+                            return { name: state };
+                        });
+                    }
+                }
+            });
+            states.initialize();
+            $('#new input[name="state"].typeahead').typeahead(null, {
+                name: 'states',
+                displayKey: 'name',
+                source: states.ttAdapter()
+            });
+            var cities = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                limit: 10,
+                remote: {
+                    url: '{% url 'data_city' 'q1' 'q2' %}',
+                    filter: function(list) {
+                        return $.map(list, function(city) {
+                            return { name: city };
+                        });
+                    },
+                    replace: function(url, query) {
+                        return url.replace('q1', $('input[name="state"]').val())
+                                .replace('q2', query);
+                    }
+                }
+            });
+            cities.initialize();
+            $('#new input[name="city"].typeahead').typeahead(null, {
+                name: 'cities',
+                displayKey: 'name',
+                source: cities.ttAdapter()
+            });
+            $('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
+            $('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
+
+            // -- //
+
+            var logout = function() {
+                $.ajax({ type: "POST", url: "", data: {fnc: 'logout'},
+                    complete: function(res) { location.reload(); }});
+            };
+            var show_info = function() {
+                $("#info div").eq(0).removeClass("alert-warning").addClass("alert-info").text("Processing...");
+                $("#info div").eq(1).text("");
+                $("#info_btn").tab("show");
+                $(".navbar .active").removeClass("active");
+            };
+            var clear_forms = function() {
+                $("form input[name='account_number'], #new .form-group input").val('');
+                $(".active").removeClass("active");
+                $("#msg").attr("class","hide");
+            };
+
+            // -- //
+
+            $("#mgmt_form").submit(function(e){
+                e.preventDefault();
+                var account_number = $("#mgmt_form input[name='account_number']").val();
+                var account_status = $("#mgmt_form [name='status']").bootstrapSwitch('state') ? 'A' : 'I';
+                var data = {account_number: account_number,
+                            account_status: account_status,
+                            fnc: 'mgmt',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: mgmt_complete });
+                $("#msg").attr("class","alert alert-info")
+                    .text("Processing...");
+                return false;
+            });
+            var mgmt_complete = function(res, status) {
+                if (status == "success") {
+                    $("#msg").attr("class","alert alert-success")
+                        .text("Success!");
+                } else {
+                    $("#msg").attr("class","alert alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#msg").text(res.responseText);
+                    }
+                }
+            };
+            $("#new_form").submit(function(e){
+                e.preventDefault();
+                $("#msg").attr("class","alert alert-info")
+                    .text("Processing...");
+                var data = {
+                            firstname: $("#new_form input[name='firstname']").val(),
+                            lastname: $("#new_form input[name='lastname']").val(),
+                            addr: $("#new_form input[name='streetaddr']").val(),
+                            state: $("#new_form input[name='state']").val(),
+                            city: $("#new_form input[name='city']").val(),
+                            d_amount: $("#new_form input[name='d_amount']").val(),
+                            account_number: $("#new_form input[name='account_number']").val(),
+                            pin: $("#new_form input[name='pin']").val(),
+                            account_status: $("#new_form [name='status']").bootstrapSwitch('state') ? 'A' : 'I',
+                            fnc: 'new',
+                            };
+                $.ajax({ type: "POST", url: "", data: data, complete: new_complete });
+                window.scrollTo(0, 0);
+                return false;
+            });
+            var new_complete = function(res, status) {
+                var jObj = res.responseJSON;
+                if (status == "success") {
+                    $("#msg").attr("class","hide");
+                    show_info();
+                    $("#info div").eq(0).text('Success!');
+                    $("#info div").eq(1).html('<p>You create customer: <span class="amount">$' + jObj.w_amount
+                            + "</span><br/>Balance: <span class=\"balance\">$" + jObj.balance + "</span></p>");
+                } else {
+                    $("#msg").attr("class","alert alert-warning").text("Error!");
+                    if (res.responseText == 'logout') {
+                        logout();
+                    } else if (res.responseText != '') {
+                        $("#msg").text(res.responseText);
+                    }
+                }
+            };
+ 
+
+            $("#logout").click(function(e){
+                logout();
+                return false;
+            });
+            $("#mgmt_btn, #new_btn").click(function(e){
+                clear_forms();
+            });
+        });
+    </script>
+{% endblock %}
